@@ -16,6 +16,7 @@ pub struct Manifest {
     pub module_system: ModuleSystem,
     pub generations_dir: String,
     pub generations_for_users_dir: String,
+    pub derivation_build_command: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
@@ -71,7 +72,7 @@ pub struct Secret {
     pub group: OwnerOrGroup,
     pub mode: String,
     pub name: String,
-    pub placeholder: PathBuf,
+    pub placeholder: String,
     pub generator: Option<Generator>,
     pub path: PathBuf,
     pub recipients: Vec<String>,

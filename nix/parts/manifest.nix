@@ -27,6 +27,7 @@ in
         storagePath
         generationsDir
         generationsForUsersDir
+        derivationBuildCommand
         ;
 
       inherit moduleSystem;

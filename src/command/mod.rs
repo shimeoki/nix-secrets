@@ -25,7 +25,7 @@ pub struct Args {
     command: Command,
 
     #[clap(short, long, default_value = ".")]
-    #[arg(add = ArgValueCompleter::new(utils::complete_flake))]
+    #[arg(add = ArgValueCompleter::new(utils::complete_flake), global = true)]
     /// path to the flake containing secrets
     flake: String,
 }

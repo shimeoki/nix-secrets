@@ -4,11 +4,18 @@ use std::{
 };
 
 use crate::{Result, manifest, utils};
-use eyre::{Context, OptionExt as _, bail};
+use eyre::{Context, OptionExt, bail};
 use rustix::system::uname;
 
 use crate::FLAKE_CONFIGURATION_PREFIX;
 use crate::manifest::Manifest;
+
+static MODULE_SYSTEMS: &[&str] = &[
+    "nixosConfigurations",
+    "darwinConfigurations",
+    "homeConfigurations",
+    "hjemConfigurations",
+];
 
 pub fn parse_flake_fallback(
     flake: &str,
@@ -36,7 +43,11 @@ pub fn parse_flake_fallback(
     };
 
     let (module_system, hostname) = match attr.split_once('.') {
-        Some((module_system, hostname)) if !module_system.is_empty() && !hostname.is_empty() => {
+        Some((module_system, hostname))
+            if !module_system.is_empty()
+                && !hostname.is_empty()
+                && MODULE_SYSTEMS.contains(&module_system) =>
+        {
             (Some(module_system.to_string()), hostname.to_string())
         }
         _ => (None, attr.to_string()),
@@ -86,12 +97,12 @@ pub fn eval_env_command(var: &str, default: &str, input: &str) -> Result<String>
     Ok(output)
 }
 
-pub fn eval_generator(generator: &str) -> Result<String> {
+pub fn eval_derivation(manifest_command: &str, generator: &str) -> Result<String> {
     trace!("Evaluating generator: `{generator}`");
 
     let build_output = eval_env_command(
-        "NIX_SECRETS_GENERATOR_BUILD_COMMAND",
-        "nix-store --realise {{input}}",
+        "NIX_SECRETS_DERIVATION_BUILD_COMMAND",
+        manifest_command,
         generator,
     )?;
 
@@ -176,6 +187,14 @@ mod test_flake_parsing {
     fn parse_flake_empty() -> Result<()> {
         let actual = parse_flake("", false);
         let expected = Some(("".to_string(), None, get_attr_fallback()));
+        assert_eq!(actual, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn parse_flake_macos() -> Result<()> {
+        let actual = parse_flake("#laptop.local", false);
+        let expected = Some(("".to_string(), None, "laptop.local".to_string()));
         assert_eq!(actual, expected);
         Ok(())
     }

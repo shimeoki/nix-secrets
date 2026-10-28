@@ -66,6 +66,8 @@ let
                 value:
                 if builtins.isPath value then
                   value
+                else if value ? drvPath then
+                  value.drvPath
                 else
                   # Deduplicates placeholder files automatically.
                   builtins.toFile "nix-secrets-placeholder" value;
