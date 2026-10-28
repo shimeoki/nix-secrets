@@ -6,6 +6,17 @@ let
     { name, config, ... }:
     {
       options = {
+        enable = lib.mkOption {
+          description = ''
+            Whether to enable this secret.
+
+            When this option is set to `false`, the secret is not included
+            in the resulting manifest, like it does not exist in the first place.
+          '';
+          type = lib.types.bool;
+          default = true;
+          example = false;
+        };
 
         name = lib.mkOption {
           description = ''
