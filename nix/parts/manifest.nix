@@ -6,6 +6,10 @@
 }:
 let
   cfg = config.security.nix-secrets;
+
+  keepEnabled = lib.filterAttrs (_name: value: value.enable);
+  enabledSecrets = keepEnabled cfg.secrets;
+  enabledTemplates = keepEnabled cfg.templates;
 in
 {
   options.security.nix-secrets.manifest = lib.mkOption {
@@ -42,7 +46,7 @@ in
           mode
           templateKey
           ;
-      }) cfg.secrets;
+      }) enabledSecrets;
 
       templates = lib.mapAttrsToList (_name: value: {
         inherit (value)
@@ -54,7 +58,7 @@ in
           group
           mode
           ;
-      }) cfg.templates;
+      }) enabledTemplates;
     };
     readOnly = true;
     internal = true;

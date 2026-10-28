@@ -4,6 +4,17 @@ let
     { name, ... }:
     {
       options = {
+        enable = lib.mkOption {
+          description = ''
+            Whether to enable this template.
+
+            When this option is set to `false`, the template is not included
+            in the resulting manifest, like it does not exist in the first place.
+          '';
+          type = lib.types.bool;
+          default = true;
+          example = false;
+        };
 
         name = lib.mkOption {
           description = ''
